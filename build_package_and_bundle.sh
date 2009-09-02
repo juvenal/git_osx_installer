@@ -1,24 +1,40 @@
 #!/bin/bash
+#
+#
+#
+#
+#
+#
+#
+#
+#
+#
 
-# remove old installers
+# Prepare some constants used everywhere
+export GIT_VERSION="${1:-`curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed $sed_regexp 's/^.+>v([0-9.]+)<.+$/\1/'`}"
+export PACKAGE_NAME="git-$GIT_VERSION-leopard"
+export IMAGE_FILENAME="git-$GIT_VERSION-leopard.dmg" 
+
+# Prepare the stage and remove old installers
+[ ! -d Disk\ Image ] && \
+	mkdir -p Disk\ Image
 rm Disk\ Image/*.pkg
 
-./build.sh
+# Run the binary build script
+./build_universal_binary.sh
 
-GIT_VERSION=$(git --version | sed 's/git version //')
-PACKAGE_NAME="git-$GIT_VERSION-leopard"
-IMAGE_FILENAME="git-$GIT_VERSION-leopard.dmg" 
-
+# Print some information
 echo $PACKAGE_NAME | pbcopy
 echo "Git version is $GIT_VERSION"
 
+# Build the package
 /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker --doc Git\ Installer.pmdoc/ -o Disk\ Image/git-$GIT_VERSION-leopard.pkg --title "Git $GIT_VERSION"
 
 echo "Testing the installer..."
 
 #./test_installer.sh
 
-printf "$GIT_VERSION" | pbcopy
+#printf "$GIT_VERSION" | pbcopy
 
 UNCOMPRESSED_IMAGE_FILENAME="git-$GIT_VERSION-leopard.uncompressed.dmg"
 hdiutil create $UNCOMPRESSED_IMAGE_FILENAME -srcfolder "Disk Image" -volname "Git $GIT_VERSION Leopard" -ov
