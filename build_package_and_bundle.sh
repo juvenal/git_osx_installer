@@ -10,6 +10,13 @@
 #
 #
 
+# Conditional define
+if [ "`uname`" == "Darwin" ]; then
+	sed_regexp="-E"
+else
+	sed_regexp="-r"
+fi
+
 # Prepare some constants used everywhere
 export GIT_VERSION="${1:-`curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed $sed_regexp 's/^.+>v([0-9.]+)<.+$/\1/'`}"
 export PACKAGE_NAME="git-$GIT_VERSION-leopard"
@@ -23,6 +30,7 @@ rm Disk\ Image/*.pkg
 # Run the binary build script
 ./build_universal_binary.sh
 
+exit 0
 # Print some information
 echo $PACKAGE_NAME | pbcopy
 echo "Git version is $GIT_VERSION"
@@ -31,9 +39,7 @@ echo "Git version is $GIT_VERSION"
 /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker --doc Git\ Installer.pmdoc/ -o Disk\ Image/git-$GIT_VERSION-leopard.pkg --title "Git $GIT_VERSION"
 
 #echo "Testing the installer..."
-
 #./test_installer.sh
-
 #printf "$GIT_VERSION" | pbcopy
 
 UNCOMPRESSED_IMAGE_FILENAME="git-$GIT_VERSION-leopard.uncompressed.dmg"
