@@ -30,7 +30,7 @@ echo "Git version is $GIT_VERSION"
 # Build the package
 /Developer/Applications/Utilities/PackageMaker.app/Contents/MacOS/PackageMaker --doc Git\ Installer.pmdoc/ -o Disk\ Image/git-$GIT_VERSION-leopard.pkg --title "Git $GIT_VERSION"
 
-echo "Testing the installer..."
+#echo "Testing the installer..."
 
 #./test_installer.sh
 

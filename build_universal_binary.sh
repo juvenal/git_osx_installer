@@ -1,14 +1,21 @@
 #!/bin/sh
+#
+#
+#
+#
+
+# Conditional define
 if [ "`uname`" == "Darwin" ]; then
 	sed_regexp="-E"
 else
 	sed_regexp="-r"
 fi 
 
+# Prepare some internal variables
 PREFIX=/usr/local
 DESTDIR=`pwd`
-GIT_VERSION="${1:-`curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed $sed_regexp 's/^.+>v([0-9.]+)<.+$/\1/'`}"
 
+# Start the build process
 echo "Building GIT_VERSION $GIT_VERSION"
 
 [ ! -d git_build ] && \
@@ -56,3 +63,6 @@ popd
 
 # add .DS_Store to default ignore for new repositories
 sh -c "echo .DS_Store >> $DESTDIR/share/git-core/templates/info/exclude"
+
+# Inform the build completion
+echo "Finished build GIT_VERSION $GIT_VERSION"
