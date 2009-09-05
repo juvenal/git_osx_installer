@@ -48,21 +48,21 @@ pushd git_build
              prefix=$PREFIX DESTDIR=$DESTDIR install
 
         # contrib
-        mkdir -p $DESTDIR/contrib/completion
-        cp contrib/completion/git-completion.bash $DESTDIR/contrib/completion/
+        mkdir -p $DESTDIR/usr/local/share/git/contrib/completion
+        cp contrib/completion/git-completion.bash $DESTDIR/usr/local/share/git/contrib/completion/
     popd
     
     [ ! -f git-manpages-$GIT_VERSION.tar.bz2 ] && \
         curl -O http://www.kernel.org/pub/software/scm/git/git-manpages-$GIT_VERSION.tar.bz2
-    mkdir -p $DESTDIR/share/man
-    tar xjvo -C $DESTDIR/share/man -f git-manpages-$GIT_VERSION.tar.bz2
+    mkdir -p $DESTDIR/usr/local/share/man
+    tar xjvo -C $DESTDIR/usr/local/share/man -f git-manpages-$GIT_VERSION.tar.bz2
 popd
 
 ## change hardlinks for symlinks
 #ruby UserScripts/symlink_git_hardlinks.rb
 
 # add .DS_Store to default ignore for new repositories
-sh -c "echo .DS_Store >> $DESTDIR/share/git-core/templates/info/exclude"
+sh -c "echo .DS_Store >> $DESTDIR/usr/local/share/git-core/templates/info/exclude"
 
 # Inform the build completion
 echo "Finished build GIT_VERSION $GIT_VERSION"
