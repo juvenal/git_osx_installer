@@ -18,19 +18,38 @@ else
 fi
 
 # Prepare some constants used everywhere
-export GIT_VERSION="${1:-`curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed $sed_regexp 's/^.+>v([0-9.]+)<.+$/\1/'`}"
-export PACKAGE_NAME="git-$GIT_VERSION-leopard"
-export IMAGE_FILENAME="git-$GIT_VERSION-leopard.dmg" 
+export GIT_VERSION="${1:-`curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed ${sed_regexp} 's/^.+>v([0-9.]+)<.+$/\1/'`}"
+export PACKAGE_NAME="git-${GIT_VERSION}-leopard"
+export IMAGE_FILENAME="git-${GIT_VERSION}-leopard.dmg" 
 
 # Prepare the stage and remove old installers
 [ ! -d Disk\ Image ] && \
 	mkdir -p Disk\ Image
-rm Disk\ Image/*.pkg
+[ -f Disk\ Image/*.pkg ] && \
+	rm Disk\ Image/*.pkg
 
 # Run the binary build script
 ./build_universal_binary.sh
 
+# Categorize the app
+[ ! -d gitCmdLn-${GIT_VERSION} ] && \
+	mkdir -p gitCmdLn-${GIT_VERSION}/component
+[ -d gitCmdLn-${GIT_VERSION}/component/* ] && \
+	rm -rf gitCmdLn-${GIT_VERSION}/component/*
+mv usr/local/* gitCmdLn-${GIT_VERSION}/component
+
+#mkdir gitCmdLn && mv usr/local/* gitCmdLn
 exit 0
+
+SCCS = http://downloads.sourceforge.net/project/cssc/cssc/1.0.1/CSSC-1.0.1.tar.gz?use_mirror=ufpr
+http://sourceforge.net/projects/cssc/files/cssc/1.0.1/CSSC-1.0.1.tar.gz/download
+
+CVSps = http://www.cobite.com/cvsps/cvsps-2.2b1.tar.gz
+
+
+
+
+
 # Print some information
 echo $PACKAGE_NAME | pbcopy
 echo "Git version is $GIT_VERSION"
