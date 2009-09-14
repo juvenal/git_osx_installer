@@ -34,7 +34,8 @@ export IMAGE_FILENAME="git-${GIT_VERSION}-leopard.dmg"
 
 # Categorize the app
 [ ! -d gitCmdLn-${GIT_VERSION} ] && \
-	mkdir -p gitCmdLn-${GIT_VERSION}/component
+	mkdir -p gitCmdLn-${GIT_VERSION}/component && \
+	mkdir -p gitCmdLn-${GIT_VERSION}/extras
 [ -d gitCmdLn-${GIT_VERSION}/component/* ] && \
 	rm -rf gitCmdLn-${GIT_VERSION}/component/*
 mv usr/local/* gitCmdLn-${GIT_VERSION}/component
