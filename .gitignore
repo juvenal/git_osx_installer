@@ -3,3 +3,5 @@
 *.dmg
 /git_build
 /Disk\ Image
+/gitCmdLn
+/usr
