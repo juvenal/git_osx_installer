@@ -51,9 +51,6 @@ pushd git_build
     tar xjvo -C $DESTDIR/usr/local/share/man -f git-manpages-$GIT_VERSION.tar.bz2
 popd
 
-## change hardlinks for symlinks
-#ruby UserScripts/symlink_git_hardlinks.rb
-
 # add .DS_Store to default ignore for new repositories
 sh -c "echo .DS_Store >> $DESTDIR/usr/local/share/git-core/templates/info/exclude"
 
