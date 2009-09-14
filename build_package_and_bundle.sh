@@ -18,7 +18,8 @@ else
 fi
 
 # Prepare some constants used everywhere
-export GIT_VERSION="${1:-`curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed ${sed_regexp} 's/^.+>v([0-9.]+)<.+$/\1/'`}"
+LAST_VERSION=`curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed ${sed_regexp} 's/^.+>v([0-9.]+)<.+$/\1/'`
+export GIT_VERSION="${1:-${LAST_VERSION}}"
 export PACKAGE_NAME="git-${GIT_VERSION}-leopard"
 export IMAGE_FILENAME="git-${GIT_VERSION}-leopard.dmg" 
 

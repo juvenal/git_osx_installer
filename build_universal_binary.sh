@@ -4,19 +4,12 @@
 #
 #
 
-# Conditional define
-if [ "`uname`" == "Darwin" ]; then
-	sed_regexp="-E"
-else
-	sed_regexp="-r"
-fi 
-
 # Prepare some internal variables
 PREFIX=/usr/local
 DESTDIR=`pwd`
 
 # Start the build process
-echo "Building GIT_VERSION $GIT_VERSION"
+echo "Building GIT $GIT_VERSION"
 
 [ ! -d git_build ] && \
 	mkdir -p git_build

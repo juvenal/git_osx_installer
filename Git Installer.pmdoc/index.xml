@@ -25,7 +25,6 @@
   </resources>
   <flags/>
   <item type="file">01git.xml</item>
-  <item type="file">02etc.xml</item>
   <mod>properties.anywhereDomain</mod>
   <mod>properties.systemDomain</mod>
   <mod>properties.title</mod>
