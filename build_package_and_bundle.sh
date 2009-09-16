@@ -33,12 +33,25 @@ export IMAGE_FILENAME="git-${GIT_VERSION}-leopard.dmg"
 ./build_universal_binary.sh
 
 # Categorize the app
+# First of all prepare the folder structure
 [ ! -d gitCmdLn-${GIT_VERSION} ] && \
-	mkdir -p gitCmdLn-${GIT_VERSION}/component && \
+	mkdir gitCmdLn-${GIT_VERSION}
+[ ! -d gitCmdLn-${GIT_VERSION}/component ] && \
+	mkdir gitCmdLn-${GIT_VERSION}/component
+[ ! -d gitCmdLn-${GIT_VERSION}/extras ] && \
 	mkdir -p gitCmdLn-${GIT_VERSION}/extras
+# Now fill it with the needed filed
+
 [ -d gitCmdLn-${GIT_VERSION}/component/* ] && \
-	rm -rf gitCmdLn-${GIT_VERSION}/component/*
-mv usr/local/* gitCmdLn-${GIT_VERSION}/component
+	rm -rf gitCmdLn-${GIT_VERSION}/component/* && \
+	cp -r usr/local/* gitCmdLn-${GIT_VERSION}/component
+[ -f gitCmdLn-${GIT_VERSION}/extras/* ] && \
+	rm -rf gitCmdLn-${GIT_VERSION}/extras/* && \
+	cat > file.xxx << __END__
+
+
+
+__END__
 
 #mkdir gitCmdLn && mv usr/local/* gitCmdLn
 exit 0
