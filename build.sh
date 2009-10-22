@@ -21,7 +21,7 @@ CONTAINERPKG=${BUILDPKG}/"Disk Image"
 # ===========================================================================
 
 # Conditional define
-if [ "`uname`" == "Darwin" ]; then
+if [ "$(uname)" == "Darwin" ]; then
 	sed_regexp="-E"
 else
 	sed_regexp="-r"
