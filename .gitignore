@@ -1,6 +1,8 @@
 .DS_Store
 *.pkg
 *.dmg
+/work
+/build
 /git_build
 /Disk\ Image
 /gitCmdLn

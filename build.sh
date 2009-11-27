@@ -11,7 +11,8 @@
 #
 
 # Define some destinations
-WORKDIR=$(pwd)
+LPWD=$(pwd)
+WORKDIR="${LPWD}/work"
 INSTALL="/usr/local"
 BUILDPKG="${WORKDIR}/git_build"
 TINSTPKG="${WORKDIR}/git_install"
@@ -39,21 +40,25 @@ export IMAGE_FILENAME="git-${GIT_VERSION}-leopard.dmg"
 function build_universal_binary {
 	# Inform and start the build process
 	echo "Building GIT $GIT_VERSION"
-	# Go to the build area
+	# Prepare the work area
+	[ ! -d ${WORKDIR} ] && \
+		mkdir -p ${WORKDIR}
+	# Go to the work area
 	pushd ${WORKDIR}
+	# Prepare the build stage
 	[ ! -d ${BUILDPKG} ] && \
 		mkdir -p ${BUILDPKG}
-	# Go to the build area and refresh it
+	# Go to the build stage and refresh it
 	pushd ${BUILDPKG}
 	[ ! -f git-${GIT_VERSION}.tar.bz2 ] && \
 		curl -O http://kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.bz2
 	[ -d git-${GIT_VERSION} ] && \
 		rm -rf git-${GIT_VERSION}
 	tar xjvf git-${GIT_VERSION}.tar.bz2
-	# Enter and perform the build and install
+	# Enter the build package area and perform the build and temporary install
 	pushd git-${GIT_VERSION}
 	# If you're on PPC, you may need to uncomment this line: 
-	# echo "MOZILLA_SHA1=1" >> Makefile_tmp
+	echo "MOZILLA_SHA1=1" >> Makefile_tmp
 	# Tell make to use $PREFIX/lib rather than MacPorts:
 	echo "NO_DARWIN_PORTS=1" >> Makefile_tmp
 	echo "NO_CROSS_DIRECTORY_HARDLINKS=1" >> Makefile_tmp
@@ -72,32 +77,41 @@ function build_universal_binary {
 	# Add the contrib completion file
 	mkdir -p ${TINSTPKG}/usr/local/share/git/contrib/completion
 	cp contrib/completion/git-completion.bash ${TINSTPKG}/usr/local/share/git/contrib/completion/
+	# Leave the build package area
 	popd
-	# Collect and install the man pages
+	# Collect the man pages on the build stage and install them
 	[ ! -f git-manpages-${GIT_VERSION}.tar.bz2 ] && \
 		curl -O http://www.kernel.org/pub/software/scm/git/git-manpages-${GIT_VERSION}.tar.bz2
-	[ -d ${TINSTPKG}/usr/local/share/man ] && \
-		rm -rf ${TINSTPKG}/usr/local/share/man
+#	[ -d ${TINSTPKG}/usr/local/share/man ] && \
+#		rm -rf ${TINSTPKG}/usr/local/share/man
 	mkdir -p ${TINSTPKG}/usr/local/share/man
 	tar xjvo -C ${TINSTPKG}/usr/local/share/man -f git-manpages-${GIT_VERSION}.tar.bz2
+	# Leave the build stage
 	popd
+	# Leave the work area
 	popd
 	# add .DS_Store to default ignore for new repositories
 	echo ".DS_Store" >> "${TINSTPKG}/usr/local/share/git-core/templates/info/exclude"
+	# Put the application on the final /Applications folder
+	[ ! -d "${TINSTPKG}/Applications" ] && \
+		mkdir -p "${TINSTPKG}/Applications" || \
+		rm -rf "${TINSTPKG}/Applications/*"
+	# Go to the $TINSTPKG/Applications to create the link
+	pushd "${TINSTPKG}/Applications"
+	ln -s "../usr/local/share/git-gui/lib/Git Gui.app" "Git Gui.app"
+	# Leave the $TINSTPKG/Applications folder
+	popd
 	# Inform the build completion
 	echo "Finished build GIT ${GIT_VERSION}"
 	# End function
 }
 
 function build_package_container {
-	# Define some local variables
-	local DESTDIR=${1}
-	local CONTAINER=${2}
 	# Prepare the stage and remove old installers
-	[ ! -d ${CONTAINER} ] && \
-		mkdir -p ${CONTAINER}
-	[ -f ${CONTAINER}/*.pkg ] && \
-		rm -rf ${CONTAINER}/*.pkg
+	[ ! -d ${CONTAINERPKG} ] && \
+		mkdir -p ${CONTAINERPKG}
+	[ -f ${CONTAINERPKG}/*.pkg ] && \
+		rm -rf ${CONTAINERPKG}/*.pkg
 	# Categorize the app
 	# First of all prepare the application folder structure
 	rm -rf gitApp-${GIT_VERSION}
@@ -119,8 +133,9 @@ function build_package_container {
 # Run the binary build script
 build_universal_binary
 exit 0
+
 # Prepare the package container
-build_package_container ${BUILDPKG} ${CONTAINERPKG}
+build_package_container
 
 
 
