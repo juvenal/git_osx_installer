@@ -35,6 +35,7 @@ LAST_VERSION=$(curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed ${s
 export GIT_VERSION="${1:-${LAST_VERSION}}"
 export PACKAGE_NAME="git-${GIT_VERSION}-leopard"
 export IMAGE_FILENAME="git-${GIT_VERSION}-leopard.dmg" 
+export MACOSX_VERSION=$(sw_vers | grep "ProductVersion:" | cut -f 2 - | tr -d "." | cut -c 1-3)
 
 # Internal functions to perform the complete build
 function build_universal_binary {
@@ -64,16 +65,29 @@ function build_universal_binary {
 	echo "NO_CROSS_DIRECTORY_HARDLINKS=1" >> Makefile_tmp
 	cat Makefile >> Makefile_tmp
 	mv Makefile_tmp Makefile
-	# Build fat binaries with ppc and i386 code for Leopard (10.5) 32 and 64 bits
-	make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
-		 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
-		 prefix=${INSTALL} all
-	make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
-		 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
-		 prefix=${INSTALL} strip
-	make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
-		 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
-		 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
+	# Build fat binaries with ppc and x86 with 32 and 64 bits support for
+	# Leopard (10.5 => 105) and/or Snow Leopard (10.6 => 106).
+	if [ "${MACOSX_VERSION}" == "106" ]; then
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} all
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} strip
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
+	elif [ "${MACOSX_VERSION}" == "105" ]; then
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
+			 prefix=${INSTALL} all
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
+			 prefix=${INSTALL} strip
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
+			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
+	fi
 	# Add the contrib completion file
 	mkdir -p ${TINSTPKG}/usr/local/share/git/contrib/completion
 	cp contrib/completion/git-completion.bash ${TINSTPKG}/usr/local/share/git/contrib/completion/
@@ -82,8 +96,6 @@ function build_universal_binary {
 	# Collect the man pages on the build stage and install them
 	[ ! -f git-manpages-${GIT_VERSION}.tar.bz2 ] && \
 		curl -O http://www.kernel.org/pub/software/scm/git/git-manpages-${GIT_VERSION}.tar.bz2
-#	[ -d ${TINSTPKG}/usr/local/share/man ] && \
-#		rm -rf ${TINSTPKG}/usr/local/share/man
 	mkdir -p ${TINSTPKG}/usr/local/share/man
 	tar xjvo -C ${TINSTPKG}/usr/local/share/man -f git-manpages-${GIT_VERSION}.tar.bz2
 	# Leave the build stage
@@ -130,6 +142,7 @@ function build_package_container {
 	# End function
 }
 
+# Main script... Collect build options first
 # Run the binary build script
 build_universal_binary
 exit 0
