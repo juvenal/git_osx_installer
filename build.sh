@@ -33,9 +33,14 @@ fi
 # Prepare some constants used everywhere
 LAST_VERSION=$(curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed ${sed_regexp} 's/^.+>v([0-9.]+)<.+$/\1/')
 export GIT_VERSION="${1:-${LAST_VERSION}}"
-export PACKAGE_NAME="git-${GIT_VERSION}-leopard"
-export IMAGE_FILENAME="git-${GIT_VERSION}-leopard.dmg" 
 export MACOSX_VERSION=$(sw_vers | grep "ProductVersion:" | cut -f 2 - | tr -d "." | cut -c 1-3)
+if [ "${MACOSX_VERSION}" == "106" ]; then
+	export PACKAGE_NAME="git-snowleopard-universal.pkg"
+	export IMAGE_FILENAME="git-snowleopard-universal.dmg"
+elif [ "${MACOSX_VERSION}" == "105" ]; then
+	export PACKAGE_NAME="git-leopard-universal.pkg"
+	export IMAGE_FILENAME="git-leopard-universal.dmg"
+fi
 
 # Internal functions to perform the complete build
 function build_universal_binary {
@@ -185,7 +190,6 @@ hdiutil create $UNCOMPRESSED_IMAGE_FILENAME -srcfolder "Disk Image" -volname "Gi
 hdiutil convert -format UDZO -o $IMAGE_FILENAME $UNCOMPRESSED_IMAGE_FILENAME
 rm $UNCOMPRESSED_IMAGE_FILENAME
 
-echo "Git Installer $GIT_VERSION - OS X - Leopard - Universal Binary" | pbcopy
 open "http://code.google.com/p/git-osx-installer/downloads/entry"
 sleep 1
 open "./"
