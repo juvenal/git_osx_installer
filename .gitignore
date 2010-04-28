@@ -1,6 +1,7 @@
 .DS_Store
 *.pkg
 *.dmg
+*.swp
 /work
 /build
 /git_build
