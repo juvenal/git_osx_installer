@@ -1,1 +1,20 @@
-<pkg-contents spec="1.12"><f n="Applications" o="juvenal" g="staff" p="16877" pt="/Users/juvenal/Documents/Projects/in-git/git_osx_installer/work/git_install/Applications" m="false" t="file"><f n="Git Gui.app" o="root" g="wheel" p="16893"><f n="Contents" o="root" g="wheel" p="16893"><f n="Info.plist" o="root" g="wheel" p="33277"/><f n="MacOS" o="root" g="wheel" p="16893"><f n="Wish" o="root" g="wheel" p="33277"><mod>mode</mod></f></f><f n="Resources" o="root" g="wheel" p="16893"><f n="git-gui.icns" o="root" g="wheel" p="33277"/><f n="Scripts" o="root" g="wheel" p="16893"><f n="AppMain.tcl" o="root" g="wheel" p="33277"/></f></f></f></f></f></pkg-contents>
+<pkg-contents spec="1.12">
+  <f n="Applications" o="juvenal" g="staff" p="16877" pt="./work/git_install/Applications" m="false" t="file">
+    <f n="Git Gui.app" o="root" g="wheel" p="16893">
+      <f n="Contents" o="root" g="wheel" p="16893">
+        <f n="Info.plist" o="root" g="wheel" p="33277"/>
+        <f n="MacOS" o="root" g="wheel" p="16893">
+          <f n="Wish" o="root" g="wheel" p="33277">
+            <mod>mode</mod>
+          </f>
+        </f>
+        <f n="Resources" o="root" g="wheel" p="16893">
+          <f n="git-gui.icns" o="root" g="wheel" p="33277"/>
+          <f n="Scripts" o="root" g="wheel" p="16893">
+            <f n="AppMain.tcl" o="root" g="wheel" p="33277"/>
+          </f>
+        </f>
+      </f>
+    </f>
+  </f>
+</pkg-contents>
