@@ -1,7 +1,7 @@
 <pkgref spec="1.12" uuid="F1A9F86C-3A29-4923-87C0-8D553BD22775">
   <config>
     <identifier>GitOSX.Installer.git.Applications.pkg</identifier>
-    <version>1.0</version>
+    <version>1.7</version>
     <description/>
     <post-install type="none"/>
     <requireAuthorization/>
