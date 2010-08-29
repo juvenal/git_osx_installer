@@ -24,7 +24,7 @@ CONTAINERPKG="${WORKDIR}/Disk Image"
 # ===========================================================================
 
 # Conditional define
-if [ "$(uname)" == "Darwin" ]; then
+if [[ "$(uname)" = "Darwin" ]]; then
 	sed_regexp="-E"
 else
 	sed_regexp="-r"
@@ -34,10 +34,10 @@ fi
 LAST_VERSION=$(curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed ${sed_regexp} 's/^.+>v([0-9.]+)<.+$/\1/')
 export GIT_VERSION="${1:-${LAST_VERSION}}"
 export MACOSX_VERSION=$(sw_vers | grep "ProductVersion:" | cut -f 2 - | tr -d "." | cut -c 1-3)
-if [ "${MACOSX_VERSION}" == "106" ]; then
+if [[ "${MACOSX_VERSION}" = "106" ]]; then
 	export PACKAGE_NAME="git-snowleopard-universal.pkg"
 	export IMAGE_FILENAME="git-snowleopard-universal.dmg"
-elif [ "${MACOSX_VERSION}" == "105" ]; then
+elif [[ "${MACOSX_VERSION}" = "105" ]]; then
 	export PACKAGE_NAME="git-leopard-universal.pkg"
 	export IMAGE_FILENAME="git-leopard-universal.dmg"
 fi
@@ -47,18 +47,18 @@ function build_universal_binary {
 	# Inform and start the build process
 	echo "Building GIT $GIT_VERSION"
 	# Prepare the work area
-	[ ! -d ${WORKDIR} ] && \
+	[[ ! -d ${WORKDIR} ]] && \
 		mkdir -p ${WORKDIR}
 	# Go to the work area
 	pushd ${WORKDIR}
 	# Prepare the build stage
-	[ ! -d ${BUILDPKG} ] && \
+	[[ ! -d ${BUILDPKG} ]] && \
 		mkdir -p ${BUILDPKG}
 	# Go to the build stage and refresh it
 	pushd ${BUILDPKG}
-	[ ! -f git-${GIT_VERSION}.tar.bz2 ] && \
+	[[ ! -f git-${GIT_VERSION}.tar.bz2 ]] && \
 		curl -O http://kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.bz2
-	[ -d git-${GIT_VERSION} ] && \
+	[[ -d git-${GIT_VERSION} ]] && \
 		rm -rf git-${GIT_VERSION}
 	tar xjvf git-${GIT_VERSION}.tar.bz2
 	# Enter the build package area and perform the build and temporary install
@@ -72,7 +72,7 @@ function build_universal_binary {
 	mv Makefile_tmp Makefile
 	# Build fat binaries with ppc and x86 with 32 and 64 bits support for
 	# Leopard (10.5 => 105) and/or Snow Leopard (10.6 => 106).
-	if [ "${MACOSX_VERSION}" == "106" ]; then
+	if [[ "${MACOSX_VERSION}" = "106" ]]; then
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 prefix=${INSTALL} all
@@ -82,7 +82,7 @@ function build_universal_binary {
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
-	elif [ "${MACOSX_VERSION}" == "105" ]; then
+	elif [[ "${MACOSX_VERSION}" = "105" ]]; then
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 prefix=${INSTALL} all
@@ -99,7 +99,7 @@ function build_universal_binary {
 	# Leave the build package area
 	popd
 	# Collect the man pages on the build stage and install them
-	[ ! -f git-manpages-${GIT_VERSION}.tar.bz2 ] && \
+	[[ ! -f git-manpages-${GIT_VERSION}.tar.bz2 ]] && \
 		curl -O http://www.kernel.org/pub/software/scm/git/git-manpages-${GIT_VERSION}.tar.bz2
 	mkdir -p ${TINSTPKG}/usr/local/share/man
 	tar xjvo -C ${TINSTPKG}/usr/local/share/man -f git-manpages-${GIT_VERSION}.tar.bz2
@@ -110,7 +110,7 @@ function build_universal_binary {
 	# add .DS_Store to default ignore for new repositories
 	echo ".DS_Store" >> "${TINSTPKG}/usr/local/share/git-core/templates/info/exclude"
 	# Put the application on the final /Applications folder
-	[ ! -d "${TINSTPKG}/Applications" ] && \
+	[[ ! -d "${TINSTPKG}/Applications" ]] && \
 		mkdir -p "${TINSTPKG}/Applications" || \
 		rm -rf "${TINSTPKG}/Applications/*"
 	# Go to the $TINSTPKG/Applications to create the link
