@@ -4,9 +4,7 @@
       <f n="Contents" o="root" g="wheel" p="16893">
         <f n="Info.plist" o="root" g="wheel" p="33277"/>
         <f n="MacOS" o="root" g="wheel" p="16893">
-          <f n="Wish" o="root" g="wheel" p="33277">
-            <mod>mode</mod>
-          </f>
+          <f n="Wish" o="root" g="wheel" p="33277"><mod>mode</mod></f>
         </f>
         <f n="Resources" o="root" g="wheel" p="16893">
           <f n="git-gui.icns" o="root" g="wheel" p="33277"/>

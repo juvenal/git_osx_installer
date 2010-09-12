@@ -16,8 +16,8 @@ WORKDIR="${LPWD}/work"
 INSTALL="/usr/local"
 BUILDPKG="${WORKDIR}/git_build"
 TINSTPKG="${WORKDIR}/git_install"
-CONTAINERPKG="${WORKDIR}/Disk Image"
-
+PKGDIR="${WORKDIR}/disk_image"
+TEMPLATE_PKGDIR="${LPWD}/template_package"
 # ===========================================================================
 # Hopefully you won't need to change anything below this point.  The
 # definitions above are all that you need to build the package containers
@@ -45,7 +45,7 @@ fi
 # Internal functions to perform the complete build
 function build_universal_binary {
 	# Inform and start the build process
-	echo "Building GIT $GIT_VERSION"
+	echo "Start build procedure for GIT ${GIT_VERSION}."
 	# Prepare the work area
 	[[ ! -d ${WORKDIR} ]] && \
 		mkdir -p ${WORKDIR}
@@ -73,26 +73,31 @@ function build_universal_binary {
 	# Build fat binaries with ppc and x86 with 32 and 64 bits support for
 	# Leopard (10.5 => 105) and/or Snow Leopard (10.6 => 106).
 	if [[ "${MACOSX_VERSION}" = "106" ]]; then
+	    echo "Building GIT ${GIT_VERION} for Snow Leopard..."
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 prefix=${INSTALL} all
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 prefix=${INSTALL} strip
+		echo "Preparing install of GIT ${GIT_VERSION} on Snow Leopard..."
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
 	elif [[ "${MACOSX_VERSION}" = "105" ]]; then
+	    echo "Building GIT ${GIT_VERSION} for Leopard..."
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 prefix=${INSTALL} all
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 prefix=${INSTALL} strip
+		echo "Preparing install of GIT ${GIT_VERSION} on Leopard..."
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
 	fi
+	echo "The complete build and install logs are at ${BUILD_LOG}"
 	# Add the contrib completion file
 	mkdir -p ${TINSTPKG}/usr/local/share/git/contrib/completion
 	cp contrib/completion/git-completion.bash ${TINSTPKG}/usr/local/share/git/contrib/completion/
@@ -124,25 +129,21 @@ function build_universal_binary {
 }
 
 function build_package_container {
+    # Inform the start of packaging function
+    echo "Start packaging procedure for GIT ${GIT_VERSION}."
+    # Define some constants
+    BUILDBIN="/Developer/Applications/Utilities"
 	# Prepare the stage and remove old installers
-	[ ! -d ${CONTAINERPKG} ] && \
-		mkdir -p ${CONTAINERPKG}
-	[ -f ${CONTAINERPKG}/*.pkg ] && \
-		rm -rf ${CONTAINERPKG}/*.pkg
-	# Categorize the app
-	# First of all prepare the application folder structure
-	rm -rf gitApp-${GIT_VERSION}
-	rm -rf gitCmdLn-${GIT_VERSION}
-	mkdir -p gitApp-${GIT_VERSION}/component
-	mkdir -p gitCmdLn-${GIT_VERSION}/component
-	mkdir -p gitCmdLn-${GIT_VERSION}/extras
-	# Fill the components and extras for the gitApp part
-	[ -d gitApp-${GIT_VERSION}/extras
-	# Now fill it with the needed files
-	cp -r ${DESTDIR}/usr/local/* gitCmdLn-${GIT_VERSION}/component
-	cat 
-	# Fill the components and extras for the gitCmdLn part
-	[ -d gitCmdLn-${GIT_VERSION}/component
+	[ ! -d ${PKGDIR} ] && \
+		cp -r ${TEMPLATE_PKGDIR} ${PKGDIR}
+	[ -f ${PKGDIR}/*.pkg ] && \
+		rm -rf ${PKGDIR}/*.pkg
+	# Build the new package
+	echo 
+    ${BUILDBIN}/PackageMaker.app/Contents/MacOS/PackageMaker --doc Git\ Installer.pmdoc/ \
+                                                             -o ${PKGDIR}/${PACKAGE_NAME} \
+                                                             --title "Git $GIT_VERSION"
+    
 	
 	# End function
 }
@@ -150,15 +151,13 @@ function build_package_container {
 # Main script... Collect build options first
 # Run the binary build script
 build_universal_binary
-exit 0
 
 # Prepare the package container
 build_package_container
 
-
-
-#mkdir gitCmdLn && mv usr/local/* gitCmdLn
 exit 0
+
+
 
 SCCS = http://downloads.sourceforge.net/project/cssc/cssc/1.0.1/CSSC-1.0.1.tar.gz?use_mirror=ufpr
 http://sourceforge.net/projects/cssc/files/cssc/1.0.1/CSSC-1.0.1.tar.gz/download
@@ -193,3 +192,24 @@ rm $UNCOMPRESSED_IMAGE_FILENAME
 open "http://code.google.com/p/git-osx-installer/downloads/entry"
 sleep 1
 open "./"
+
+
+
+
+
+
+
+# Categorize the app
+# First of all prepare the application folder structure
+rm -rf gitApp-${GIT_VERSION}
+rm -rf gitCmdLn-${GIT_VERSION}
+mkdir -p gitApp-${GIT_VERSION}/component
+mkdir -p gitCmdLn-${GIT_VERSION}/component
+mkdir -p gitCmdLn-${GIT_VERSION}/extras
+# Fill the components and extras for the gitApp part
+[ -d gitApp-${GIT_VERSION}/extras
+# Now fill it with the needed files
+cp -r ${DESTDIR}/usr/local/* gitCmdLn-${GIT_VERSION}/component
+cat 
+# Fill the components and extras for the gitCmdLn part
+[ -d gitCmdLn-${GIT_VERSION}/component
