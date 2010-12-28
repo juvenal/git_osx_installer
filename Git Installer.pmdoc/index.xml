@@ -1,35 +1,30 @@
 <pkmkdoc spec="1.12">
   <properties>
-    <title>Git</title>
+    <title>git</title>
     <build>Disk Image/git-leopard-universal.pkg</build>
-    <organization>GitOSX.Installer</organization>
-    <userSees ui="both"/>
-    <min-target os="3"/>
-    <domain system="true"/>
+    <organization>com.git-scm.pkg.osx</organization>
+    <userSees ui="both" />
+    <min-target os="3" />
+    <domain system="true" />
   </properties>
   <distribution>
-    <versions min-spec="1.000000"/>
-    <scripts>
-    </scripts>
+    <versions min-spec="1.000000" />
+    <scripts></scripts>
   </distribution>
   <contents>
-    <choice title="Git" id="choice1" starts_selected="true" starts_enabled="true" starts_hidden="false">
-      <pkgref id="GitOSX.Installer.git.local.pkg"/>
+    <choice title="cmd" id="choice1" description="Command line portion of git-scm for Mac OS X 10.5+" starts_selected="true" starts_enabled="true" starts_hidden="false">
+      <customLoc mod="true">/usr/local</customLoc>
+      <pkgref id="com.git-scm.pkg.osx.cmd" />
     </choice>
-    <choice title="Applications" id="choice4" starts_selected="true" starts_enabled="true" starts_hidden="false">
-      <pkgref id="GitOSX.Installer.git.Applications.pkg"/>
+    <choice title="gui" id="choice2" description="Graphical Tool portion of git-scm for Mac OS X 10.5+" starts_selected="true" starts_enabled="true" starts_hidden="false">
+      <customLoc mod="true">/Applications</customLoc>
+      <pkgref id="com.git-scm.pkg.osx.gui" />
     </choice>
   </contents>
   <resources bg-scale="none" bg-align="topleft">
-    <locale lang="en"/>
+    <locale lang="en" />
   </resources>
-  <requirements>
-    <requirement id="sosv" operator="lt" value="'10.5'">
-      <message-title>Mac OS X version</message-title>
-      <message>You need at least Mac OS X Leopard to install this package.</message>
-    </requirement>
-  </requirements>
-  <flags/>
+  <flags />
   <item type="file">01local.xml</item>
   <item type="file">02applications.xml</item>
   <mod>properties.title</mod>

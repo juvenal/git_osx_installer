@@ -143,8 +143,6 @@ function build_package_container {
     ${BUILDBIN}/PackageMaker.app/Contents/MacOS/PackageMaker --doc Git\ Installer.pmdoc/ \
                                                              -o ${PKGDIR}/${PACKAGE_NAME} \
                                                              --title "Git $GIT_VERSION"
-    
-	
 	# End function
 }
 

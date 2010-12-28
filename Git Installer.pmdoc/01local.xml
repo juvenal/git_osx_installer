@@ -1,31 +1,30 @@
-<pkgref spec="1.12" uuid="BACBD0C7-2093-4B06-851E-8D6803FF87EE">
+<pkgref spec="1.12" uuid="3D217B3B-13A4-46D0-BCFC-06DD6CC6030C">
   <config>
-    <identifier>GitOSX.Installer.git.local.pkg</identifier>
+    <identifier>com.git-scm.pkg.osx.cmd</identifier>
     <version>1.7</version>
-    <description/>
-    <post-install type="none"/>
-    <requireAuthorization/>
+    <description />
+    <post-install type="none" />
+    <requireAuthorization />
     <installFrom relative="true" mod="true">work/git_install/usr/local</installFrom>
     <installTo mod="true">/usr/local</installTo>
     <flags>
-      <followSymbolicLinks/>
+      <followSymbolicLinks />
     </flags>
-    <packageStore type="internal"/>
-    <mod>installTo</mod>
-    <mod>relocatable</mod>
+    <packageStore type="internal" />
+    <mod>installTo.path</mod>
+    <mod>version</mod>
     <mod>installFrom.path</mod>
     <mod>parent</mod>
-    <mod>version</mod>
-    <mod>installTo.path</mod>
-    <mod>installFrom.isRelativeType</mod>
+    <mod>installTo</mod>
+    <mod>identifier</mod>
   </config>
   <contents>
     <file-list>01local-contents.xml</file-list>
-    <component id="cz.or.repo.git-gui" path="./work/git_install/usr/local/share/git-gui/lib/Git Gui.app" version="0.12.0.37.g60204" isRelocatable="true">
+    <component id="cz.or.repo.git-gui" path="./work/git_install/usr/local/share/git-gui/lib/Git Gui.app" version="0.13.0-dirty" isRelocatable="true">
       <locator-info>
-        <token title="pkmk-token-2">
+        <token title="pkmk-token-26">
           <search-rule>
-            <combo identifier="cz.or.repo.git-gui" default-path="/usr/local/share/git-gui/lib/Git Gui.app"/>
+            <combo identifier="cz.or.repo.git-gui" default-path="/share/git-gui/lib/Git Gui.app" />
           </search-rule>
         </token>
       </locator-info>
