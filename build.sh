@@ -135,7 +135,7 @@ function build_package_container {
     BUILDBIN="/Developer/Applications/Utilities"
 	# Prepare the stage and remove old installers
 	[ ! -d ${PKGDIR} ] && \
-		cp -r ${TEMPLATE_PKGDIR} ${PKGDIR}
+		mkdir -p ${PKGDIR}
 	[ -f ${PKGDIR}/*.pkg ] && \
 		rm -rf ${PKGDIR}/*.pkg
 	# Build the new package
@@ -147,12 +147,17 @@ function build_package_container {
 }
 
 # Main script... Collect build options first
+#
+# Clean the work area
+rm -rf work/*
+
 # Run the binary build script
 build_universal_binary
 
 # Prepare the package container
 build_package_container
 
+# Complete the build
 exit 0
 
 
