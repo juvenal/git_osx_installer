@@ -24,20 +24,26 @@ TEMPLATE_PKGDIR="${LPWD}/template_package"
 # ===========================================================================
 
 # Conditional define
-if [[ "$(uname)" = "Darwin" ]]; then
+if [[ "$(uname)" == "Darwin" ]]; then
 	sed_regexp="-E"
 else
 	sed_regexp="-r"
 fi
 
 # Prepare some constants used everywhere
-LAST_VERSION=$(curl http://git-scm.com/ 2>&1 | grep "<div id=\"ver\">" | sed ${sed_regexp} 's/^.+>v([0-9.]+)<.+$/\1/')
+LAST_VERSION=$(curl http://git-scm.com/ 2>&1 | grep "<span class='version'>" | sed ${sed_regexp} 's/^.+>([0-9.]+)<.+$/\1/')
 export GIT_VERSION="${1:-${LAST_VERSION}}"
 export MACOSX_VERSION=$(sw_vers | grep "ProductVersion:" | cut -f 2 - | tr -d "." | cut -c 1-3)
-if [[ "${MACOSX_VERSION}" = "106" ]]; then
+if [[ "${MACOSX_VERSION}" == "108" ]]; then
+	export PACKAGE_NAME="git-mountainlion-universal.pkg"
+	export IMAGE_FILENAME="git-mountainlion-universal.dmg"
+elif [[ "${MACOSX_VERSION}" == "107" ]]; then
+	export PACKAGE_NAME="git-lion-universal.pkg"
+	export IMAGE_FILENAME="git-lion-universal.dmg"
+elif [[ "${MACOSX_VERSION}" == "106" ]]; then
 	export PACKAGE_NAME="git-snowleopard-universal.pkg"
 	export IMAGE_FILENAME="git-snowleopard-universal.dmg"
-elif [[ "${MACOSX_VERSION}" = "105" ]]; then
+elif [[ "${MACOSX_VERSION}" == "105" ]]; then
 	export PACKAGE_NAME="git-leopard-universal.pkg"
 	export IMAGE_FILENAME="git-leopard-universal.dmg"
 fi
@@ -56,11 +62,11 @@ function build_universal_binary {
 		mkdir -p ${BUILDPKG}
 	# Go to the build stage and refresh it
 	pushd ${BUILDPKG}
-	[[ ! -f git-${GIT_VERSION}.tar.bz2 ]] && \
-		curl -O http://kernel.org/pub/software/scm/git/git-${GIT_VERSION}.tar.bz2
+	[[ ! -f git-${GIT_VERSION}.tar.gz ]] && \
+		curl -O http://git-core.googlecode.com/files/git-${GIT_VERSION}.tar.gz
 	[[ -d git-${GIT_VERSION} ]] && \
 		rm -rf git-${GIT_VERSION}
-	tar xjvf git-${GIT_VERSION}.tar.bz2
+	tar xzvf git-${GIT_VERSION}.tar.gz
 	# Enter the build package area and perform the build and temporary install
 	pushd git-${GIT_VERSION}
 	# If you're on PPC, you may need to uncomment this line: 
@@ -71,9 +77,33 @@ function build_universal_binary {
 	cat Makefile >> Makefile_tmp
 	mv Makefile_tmp Makefile
 	# Build fat binaries with ppc and x86 with 32 and 64 bits support for
-	# Leopard (10.5 => 105) and/or Snow Leopard (10.6 => 106).
-	if [[ "${MACOSX_VERSION}" = "106" ]]; then
-	    echo "Building GIT ${GIT_VERION} for Snow Leopard..."
+	# Leopard (10.5 => 105) thru Mountain Lion (10.8 => 108).
+	if [[ "${MACOSX_VERSION}" == "108" ]]; then
+	    echo "Building GIT ${GIT_VERSION} for Mountain Lion..."
+		make CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} all
+		make CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} strip
+		echo "Preparing install of GIT ${GIT_VERSION} on Mountain Lion..."
+		make CFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.8.sdk -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
+	elif [[ "${MACOSX_VERSION}" == "107" ]]; then
+	    echo "Building GIT ${GIT_VERSION} for Lion..."
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} all
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} strip
+		echo "Preparing install of GIT ${GIT_VERSION} on Lion..."
+		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch i386 -arch x86_64" \
+			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch i386 -arch x86_64" \
+			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
+	elif [[ "${MACOSX_VERSION}" == "106" ]]; then
+	    echo "Building GIT ${GIT_VERSION} for Snow Leopard..."
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 prefix=${INSTALL} all
@@ -84,7 +114,7 @@ function build_universal_binary {
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.6.sdk -arch ppc -arch i386 -arch x86_64" \
 			 prefix=${INSTALL} DESTDIR=${TINSTPKG} install
-	elif [[ "${MACOSX_VERSION}" = "105" ]]; then
+	elif [[ "${MACOSX_VERSION}" == "105" ]]; then
 	    echo "Building GIT ${GIT_VERSION} for Leopard..."
 		make CFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
 			 LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.5.sdk -arch ppc -arch i386 -arch ppc64 -arch x86_64" \
@@ -134,9 +164,9 @@ function build_package_container {
     # Define some constants
     BUILDBIN="/Developer/Applications/Utilities"
 	# Prepare the stage and remove old installers
-	[ ! -d ${PKGDIR} ] && \
+	[[ ! -d ${PKGDIR} ]] && \
 		mkdir -p ${PKGDIR}
-	[ -f ${PKGDIR}/*.pkg ] && \
+	[[ -f ${PKGDIR}/*.pkg ]] && \
 		rm -rf ${PKGDIR}/*.pkg
 	# Build the new package
 	echo 
@@ -149,13 +179,14 @@ function build_package_container {
 # Main script... Collect build options first
 #
 # Clean the work area
-rm -rf work/*
+[[ -d "${WORKDIR}" ]] && \
+	rm -rf "${WORKDIR}"
 
 # Run the binary build script
 build_universal_binary
 
 # Prepare the package container
-build_package_container
+#build_package_container
 
 # Complete the build
 exit 0
